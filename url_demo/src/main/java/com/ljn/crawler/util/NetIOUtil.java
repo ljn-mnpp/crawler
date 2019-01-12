@@ -16,17 +16,8 @@ import java.util.concurrent.Executors;
  * @Description:
  **/
 public class NetIOUtil {
-    // 前提: post请求,其他的我没试过呢   调用:   $http.post("../brand/search.do?page="+page+"&rows="+rows,xxoo);
-    // 前端controller 定义变量     $scope.xxoo = {};
-    //               赋值例子1:   $scope.xxoo = {"ooxx":"xxoo"}
-    //                   后端接收  @RequestBody(其他形式没试过) ooxx
-    //
-    //               赋值例子2:   $scope.xxoo.aa = {"xxoo":"ooxx"}
-    //                  后端接收 @RequestBody(其他形式没试过) aa(是个对象,必须有xxoo字段)
-    //前提: post请求,其他的我没试过呢   调用:   $http.post("../brand/search.do?page="+page+"&rows="+rows,xxoo);
-    //
-    //          原理: 就是json传输  参考json的那天的课程  忘了是哪一天了
 
+    //  下载任务
     static class DownloadRunnable implements Runnable {
 
         private List<String> imgSources;
@@ -40,6 +31,8 @@ public class NetIOUtil {
 
         @Override
         public void run() {
+            TimeUtils t = new TimeUtils();
+            t.start(Thread.currentThread() + "爬取链接...");
             while (true) {
                 downloading = null;
                 synchronized (imgSources) {
@@ -47,16 +40,24 @@ public class NetIOUtil {
                         downloading = imgSources.remove(0);
                     }
                 }
-                if (downloading == null)
+                if (downloading == null) {
+                    t.end();
                     return;
+                }
                 downloadJpg(downloading,dir);
             }
         }
     }
 
-    public static void multiThreadDownloadJpg(List<String> imgSources, File dir) {
-        ExecutorService executorService = Executors.newFixedThreadPool(5);
-        for (int i = 0; i < 5; i++) {
+    //多线程下载
+    public static void multiThreadDownloadJpg(List<String> imgSources, File dir,Integer threadpoolSize) {
+        System.out.println("==============================================================");
+        System.out.println("开始爬取...最大线程数:"+threadpoolSize);
+        System.out.println("目标资源数量: "+imgSources.size());
+        System.out.println("警告:线程池未设置自动结束参数...如果所有线程均已爬取结束,停止程序即可.");
+        System.out.println("===============================================================");
+        ExecutorService executorService = Executors.newFixedThreadPool(threadpoolSize);
+        for (int i = 0; i < threadpoolSize; i++) {
             executorService.execute(new DownloadRunnable(imgSources,dir));
         }
     }

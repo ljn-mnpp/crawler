@@ -10,11 +10,11 @@ public class TimeUtils {
     private String msg;
     public void start(String event){
         this.msg = event;
-        System.out.println("开始 "+msg);
+        System.out.println(msg+" 开始... ");
         this.millis = System.currentTimeMillis();
     }
     public void end(){
-        System.out.println("已完成 "+msg);
+        System.out.print(msg+" 结束...");
         showTime();
     }
     public void showTime(){

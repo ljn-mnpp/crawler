@@ -1,0 +1,3 @@
+这个小程序是用来  爬取并自动下载 http://www.netbian.com 下的美女图片[其他类型页可以的,需要更改模式]
+main方法在  src/main/java/com.ljn.crawler.meinv.Display
+本人已下载  700张图片,运行正常

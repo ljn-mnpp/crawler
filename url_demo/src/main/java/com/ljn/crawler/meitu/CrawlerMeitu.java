@@ -25,6 +25,12 @@ import java.util.regex.Pattern;
         list 写入文档
     先保存图片资源,别下载...
  */
+
+/**
+ * @Author 李佳楠
+ * @Description:  这个类是随便打的,刚开始学  很乱,别看了...
+ * @Date  2019/1/12
+ **/
 public class CrawlerMeitu {
 
     //起始链接
