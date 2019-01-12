@@ -56,7 +56,10 @@ import java.util.*;
  *
  *                 大图片页面链接:  http://www.netbian.com/desk/21359-1920x1080.htm
  *                 模式:           http://www.netbian.com /desk/\\d*-1920x1080.htm
- *                 每页含一个 目标资源链接  有个蛋疼的小广告就是过滤不掉,他喵的资源地址与目标格式完全一致 除非按资源大小过滤
+ *                 每页含一个 目标资源链接
+ *                 小问题:
+ *                      有个蛋疼的小广告就是过滤不掉,他喵的资源地址与目标格式完全一致[每下载20张会带张广告图片]
+ *                      需要对页面文本进行分析才能解决,简单的直接匹配不行
  *
  *                 img图片下载链接: http://img.netbian.com/file/2018/1210/07afcefd1752d952142990c4ea0e2392.jpg
  *                 模式:           http://img\\.netbian\\.com/file/.*\\jpg
