@@ -1,11 +1,9 @@
 package com.ljn.crawler.meinv;
 
-import com.ljn.crawler.util.FileUtil;
-import com.ljn.crawler.util.NetIOUtil;
-import com.ljn.crawler.util.SimpleURLCrawlerUtil;
-import com.ljn.crawler.util.TimeUtils;
+import com.ljn.crawler.util.*;
 
-import java.io.File;
+import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -70,29 +68,45 @@ import java.util.*;
 public class Display {
 
     //图片页面链接模式
-    private static String targitHtmPattern ="/desk/\\d*\\.htm";
+    private static String targitHtmPattern; //="/desk/\\d*\\.htm";
     //链接前缀
-    private static String desk_prefix = "http://www.netbian.com";
+    private static String desk_prefix; // = "http://www.netbian.com";
     //大图片页面模式
-    private static String Htm_1920_1080_Pattern = "/desk/\\d*-1920x1080.htm";
+    private static String Htm_1920_1080_Pattern; // = "/desk/\\d*-1920x1080.htm";
     //图片资源模式
-    private static String imgSourcePattern = "http://img\\.netbian\\.com/file/.+?\\.jpg";
+    private static String imgSourcePattern; // = "http://img\\.netbian\\.com/file/.+?\\.jpg";
 
     //以下为示例参数 请自行配置
-    private static int startPage = 1;
+    private static int startPage; // = 0;
     //分页参数(endPage - endPage)20以内安全，超过20有可能被封IP 超过40一定封！ 建议: 设置为10
-    private static int endPage = 1;
+    private static int endPage; // = -1;
 
     //下载目录
-    private static String dir_path = "E:\\www_netbian_com_meinv";
+    private static String dir_path; // = "";
 
-    public static void main(String[] args) {
+    //日志输出目录
+    private static String log_path ; //= "D:\\project\\crawler\\url_demo\\src\\main\\java\\com\\ljn\\crawler\\meinv\\已下载页数";
+
+    //持有 Out 已便重定向后 重置
+    private static PrintStream out =  System.out;
+
+    public static void start(){
+
+        try {
+            checkParams();
+        } catch (IOException e) {
+            System.out.println("初始化参数异常,请检查参数是否正确");
+            e.printStackTrace();
+        }
 
         //获取图片资源链接
         List<String> imgSources = getImgSources(startPage, endPage);
 
         //多线程下载图片
         NetIOUtil.multiThreadDownloadJpg(imgSources,new File(dir_path),5);
+
+        //重置输出
+        System.setOut(out);
 
         //下载
        /* for (String imgSource : imgSources) {
@@ -109,21 +123,19 @@ public class Display {
         timeUtils.start("生成分页链接");
         LinkedList<String> pageLinks =
                 getPageLink("http://www.netbian.com/meinv/index_", ".htm", startPage, endPage);
+        CollectionUtil.sout(pageLinks);
         timeUtils.end();
 
 
         //记录已下载页
-        timeUtils.start("记录已下载页");
-        List list = new ArrayList();
-        for (int i = startPage; i <= endPage; i++) {
-            list.add(String.valueOf(i));
+        if(log_path != null && !"".equals(log_path)) {
+            timeUtils.start("记录已下载页");
+            for (int i = startPage; i <= endPage; i++) {
+                System.out.print(i+" ");
+            }
+            System.out.println("\r\n");
+            timeUtils.end();
         }
-        FileUtil.saveList(
-                new File("D:\\project\\crawler\\url_demo\\src\\main\\java\\com\\ljn\\crawler\\meinv\\已下载页数"),
-                list,true);
-        timeUtils.end();
-        //已保存
-        //FileUtil.saveList(new File("D:\\project\\crawler\\url_demo\\file\\netbianPageLinks"),pageLink);
 
         //爬取图片页面链接
         timeUtils.start("爬取图片页面链接");
@@ -132,12 +144,12 @@ public class Display {
             LinkedList<String> Htms = SimpleURLCrawlerUtil.getTargetURLS(page, targitHtmPattern);
             deskHtms.addAll(Htms);
         }
-        timeUtils.end();
-
         //拼接链接  别用增强....  String 拿出来的不是引用...
         for (int i = 0; i < deskHtms.size();i++) {
             deskHtms.set(i,desk_prefix +deskHtms.get(i));
         }
+        CollectionUtil.sout(deskHtms);
+        timeUtils.end();
 
         //爬取1920*1080图片页面链接
         timeUtils.start("爬取1920*1080图片页面链接");
@@ -148,6 +160,7 @@ public class Display {
                 htm_1920_1080_links.add(desk_prefix + desk);
             }
         }
+        CollectionUtil.sout(htm_1920_1080_links);
         timeUtils.end();
 
         //爬取1920*1080图片资源链接
@@ -157,6 +170,7 @@ public class Display {
             LinkedList<String> targetURLS = SimpleURLCrawlerUtil.getTargetURLS(htm_1920_1080_link, imgSourcePattern);
             imgSources.addAll(targetURLS);
         }
+        CollectionUtil.sout(imgSources);
         timeUtils.end();
 
         List<String> results = new LinkedList<>(imgSources);
@@ -173,4 +187,35 @@ public class Display {
         }
         return results;
     }
+
+    //检查参数
+    private static void checkParams() throws IOException {
+
+        ResourceBundle config = ResourceBundle.getBundle("config");
+        targitHtmPattern = config.getString("targitHtmPattern");
+        desk_prefix = config.getString("desk_prefix");
+        Htm_1920_1080_Pattern = config.getString("Htm_1920_1080_Pattern");
+        imgSourcePattern = config.getString("imgSourcePattern");
+        dir_path = config.getString("dir_path");
+        log_path = config.getString("log_path");
+        startPage = Integer.parseInt(config.getString("startPage"));
+        endPage = Integer.parseInt(config.getString("endPage"));
+
+
+        if(Display.endPage - Display.startPage < 0){
+            throw new RuntimeException("页面参数不正确");
+        }
+
+        if(Display.dir_path == null || "".equals(Display.dir_path)){
+            throw new RuntimeException("下载目录未设置");
+        }
+
+        if(log_path != null && !"".equals(log_path)) {
+            FileOutputStream log_out = new FileOutputStream(new File(log_path, "meinv.log"), true);
+            System.setOut(new PrintStream(log_out, true, "utf-8"));
+        }
+        System.out.println(("==================================================\r\n"));
+        System.out.println(("参数检查完成 "+ new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date())));
+    }
+
 }

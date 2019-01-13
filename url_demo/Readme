@@ -1,3 +1,5 @@
 这个小程序是用来  爬取并自动下载 http://www.netbian.com 下的美女图片[其他类型页可以的,需要更改模式]
-main方法在  src/main/java/com.ljn.crawler.meinv.Display
-本人已下载  700张图片,运行正常
+只需在配置文件config.properties中设置下载目录与日志目录即可 日志目录可以不设置
+然后运行 com.ljn.crawler.start_play.main
+
+彼岸桌面是个不错的桌面网站,壁纸挺好的
