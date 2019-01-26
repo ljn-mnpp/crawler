@@ -10,6 +10,7 @@ import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import utils.HttpClientUtil;
 import utils.HttpsUtils;
 import utils.SSLClient;
@@ -19,16 +20,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Demo {
-    private static String url = "http://image.baidu.com/search/index?tn=baiduimage&ps=1&ct=201326592&lm=-1&cl=2&nc=1&ie=utf-8&word=%E7%BE%8E%E5%A5%B3";
+    //private static String url = "https://www.baidu.com";
+    private static String url = "https://search.jd.com/Search?keyword=%E6%89%8B%E6%9C%BA&enc=utf-8&suggest=2.def.0.V13&wq=shouji&pvid=4c3eb8a3ed784aec8487862c72d9c80d";
     public static void main(String[] args) throws Exception {
         HttpClient httpClient = new SSLClient();
         HttpUriRequest request = new HttpGet(url);
-        request.addHeader("Connection","keep-alive");
-        request.addHeader("Cache-Control","max-age=0");
+        //request.addHeader("Connection","keep-alive");
+        //request.addHeader("Cache-Control","max-age=0");
         request.addHeader("User-Agent","Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
-        request.addHeader("Accept","text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+        //request.addHeader("Accept","text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
         //request.addHeader("Accept-Encoding","gzip, deflate, br");
-        request.addHeader("Accept-Language","zh-CN,zh;q=0.9");
+        //request.addHeader("Accept-Language","zh-CN,zh;q=0.9");
         HttpResponse response = httpClient.execute(request);
 
         int statusCode = response.getStatusLine().getStatusCode();
@@ -38,7 +40,11 @@ public class Demo {
         System.out.println(entity.getContentLength());
         System.out.println(entity.getContentType());
 
-        Header contentEncoding = entity.getContentEncoding();
+        String s = EntityUtils.toString(entity,"utf-8");
+        System.out.println(s);
+
+
+      /*  Header contentEncoding = entity.getContentEncoding();
         if(contentEncoding != null) {
             HeaderElement[] elements = contentEncoding.getElements();
             for (HeaderElement element : elements) {
@@ -47,7 +53,7 @@ public class Demo {
         }
 
         InputStream content = entity.getContent();
-        sout(content);
+        sout(content);*/
     }
 
     private static void sout(InputStream inputStream) throws IOException {
