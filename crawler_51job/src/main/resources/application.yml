@@ -1,0 +1,12 @@
+#DB Configuration:
+spring:
+  datasource:
+    driverClassName: com.mysql.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/crawler
+    username: root
+    password: 123
+
+#JPA Configuration:
+  jpa:
+    database: MySQL
+    show-sql: true
